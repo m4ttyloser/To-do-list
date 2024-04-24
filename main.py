@@ -12,6 +12,7 @@ def remove_task(todo_list, task):
 
 
 def show_task(todo_list):
+    print('Your task:')
     z = 1
     for x in todo_list:
         print(f'{z}.{x}')
