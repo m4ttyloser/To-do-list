@@ -1,3 +1,24 @@
+def add_task(todo_list,task):
+    todo_list.append(task)
+    print(f'Task, {task} added successfully')
+
+
+def remove_task(todo_list, task):
+    if remove in todo_list:
+        todo_list.remove(remove)
+        print('task removed')
+    else:
+        print('Task not found!')
+
+
+def show_task(todo_list):
+    z = 1
+    for x in todo_list:
+        print(f'{z}.{x}')
+        z += 1
+
+
+
 todo_list = []
 
 while True:
@@ -12,7 +33,7 @@ while True:
 
     if pick == 1:
         task = input('Enter task:').lower()
-        todo_list.append(task)
+        add_task(todo_list,task)
     
     elif pick == 2:
         
@@ -23,11 +44,7 @@ while True:
         
         remove = input('What task do you want to remove:').lower()
 
-        if remove in todo_list:
-            todo_list.remove(remove)
-            print('task removed')
-        else:
-            print('Task not found!')
+        remove_task(todo_list,task)
 
     elif pick == 3:
         z = 1
