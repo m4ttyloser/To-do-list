@@ -1,22 +1,33 @@
-def add_task(todo_list,task):
-    todo_list.append(task)
-    print(f'Task, {task} added successfully')
+import tkinter as tk
+
+class todolistapp:
+    def __init__(self):
+        self.title('To-do list')
+        
+        self.todolist = []        #Care for the list name
+        
+        self.add_button = tk.Button(text ="Add task",)
+        self.add_button.grid(row=0, column=1, padx=5, pady=10)
+
+    def add_task(todo_list,task):
+        todo_list.append(task)
+        print(f'Task, {task} added successfully')
 
 
-def remove_task(todo_list, task):
-    if remove in todo_list:
-        todo_list.remove(remove)
-        print('task removed')
-    else:
-        print('Task not found!')
+    def remove_task(todo_list, task):
+        if remove in todo_list:
+            todo_list.remove(remove)
+            print('task removed')
+        else:
+            print('Task not found!')
 
 
-def show_task(todo_list):
-    print('Your task:')
-    z = 1
-    for x in todo_list:
-        print(f'{z}.{x}')
-        z += 1
+    def show_task(todo_list):
+        print('Your task:')
+        z = 1
+        for x in todo_list:
+            print(f'{z}.{x}')
+            z += 1
 
 
 
