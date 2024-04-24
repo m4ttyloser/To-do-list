@@ -21,14 +21,9 @@ def countdown(minutes):
         time.sleep(1)
         seconds -= 1
 
-if __name__ == "__main__":
-   
-    print("Welcome to the Pomodoro Timer Helper!")
-    pomodoro_minutes = int(input("Enter the duration of each Pomodoro session (in minutes): "))
-    break_minutes = int(input("Enter the duration of the short break (in minutes): "))
-    cycles = int(input("Enter the number of Pomodoro cycles: "))
-
-    pomodoro_timer(pomodoro_minutes, break_minutes, cycles)
+print("Welcome to the Pomodoro Timer Helper!")
+pomodoro_minutes = int(input("Enter the duration of each Pomodoro session (in minutes): "))
+break_minutes = int(input("Enter the duration of the short break (in minutes): "))
+cycles = int(input("Enter the number of Pomodoro cycles: "))
+pomodoro_timer(pomodoro_minutes, break_minutes, cycles)
     
-else :
-    print("Pomodoro Error")
