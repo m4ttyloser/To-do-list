@@ -1,18 +1,17 @@
 import tkinter as tk
+from tkinter import messagebox
+from datetime import datetime
+import time
 
-class todolistapp:
+class todolistFeat:
     def __init__(self):
-        self.title('To-do list')
-        
-        self.todolist = []        #Care for the list name
-        
-        self.add_button = tk.Button(text ="Add task",)
-        self.add_button.grid(row=0, column=1, padx=5, pady=10)
+        self.task = []
+        self.total_points = 0
 
-    def add_task(todo_list,task):
-        todo_list.append(task)
-        print(f'Task, {task} added successfully')
-
+    def add_task(self, task, points=0, deadline = None):
+        timestamp = datetime.now().strftime('HH:MM AM/PM')
+        self.task.append({"task" : task, "points": points, "deadline": deadline, "timestamp": timestamp, "status": False})
+        
 
     def remove_task(todo_list, task):
         if remove in todo_list:
@@ -29,44 +28,3 @@ class todolistapp:
             print(f'{z}.{x}')
             z += 1
 
-
-
-todo_list = []
-
-while True:
-    print('+----------------------------+')
-    print('1.Add task')
-    print('2.Remove task')
-    print('3.Show task')
-    print('4.Quit program')
-    print('+----------------------------+')
-
-    pick = int(input('Your action:'))
-
-    if pick == 1:
-        task = input('Enter task:').lower()
-        add_task(todo_list,task)
-    
-    elif pick == 2:
-        
-        for i in todo_list:
-            y = 1
-            print(f'{y}.{i}')
-            y += 1
-        
-        remove = input('What task do you want to remove:').lower()
-
-        remove_task(todo_list,task)
-
-    elif pick == 3:
-        z = 1
-        for x in todo_list:
-            print(f'{z}.{x}')
-            z += 1
-
-    elif pick == 4:
-        print('Exiting')
-        break
-
-    else:
-        print('Number is not recognized')
