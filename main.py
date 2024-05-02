@@ -23,7 +23,6 @@ root.title("To-do list")
 root.geometry("400x650+400+100")
 root.resizable(False,False)
 
-task_list = []
 
 #icon
 Image_icon = PhotoImage(file = "task.png") # image not popping out
@@ -45,7 +44,6 @@ heading.place(x=130,y=20)
 frame = Frame(root,width=400, height = 50,bg = "white")
 frame.place(x=0,y=180)
 
-task = StringVar()
 task_entry = Entry(frame,width = 18,font = "arial 20",bd=0)
 task_entry.place(x = 10, y = 7)
 
