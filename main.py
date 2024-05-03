@@ -11,11 +11,31 @@ def add_task():
 
 
 def remove_task():
-    try:
-        selected_task_index = listbox.curselection()[0]
+    selected_task_index = listbox.curselection()
+    if selected_task_index:
         listbox.delete(selected_task_index)
-    except IndexError:
-        pass
+    else:
+        messagebox.showwarning("PLease select a task to remove")
+
+def mark_as_done():
+    selected_task_index = listbox.curselection()
+    if selected_task_index:
+        selected_task = listbox.get(selected_task_index)
+        if not selected_task.endswith("\u2713"):
+            completed_task = selected_task + " \u2713"  
+            listbox.itemconfig(selected_task_index, {'bg':'light grey', 'fg':'grey'})
+            listbox.delete(selected_task_index)
+            listbox.insert(selected_task_index, completed_task)
+            update_score(1)  
+            button_mark_as_done.config(state=DISABLED)
+        else:
+            button_mark_as_done.config(state=NORMAL)
+
+
+def update_score(points):
+    global score
+    score += points
+    score_label.config(text=str(score))
 
 
 root = Tk()
@@ -69,9 +89,10 @@ Button(root, image=delete_icon, bd=0, command=remove_task).pack(side=LEFT,padx =
 
 
 #mark as done button
-mark_as_done = PhotoImage(file="tick.png")
-small_mark_as_done = mark_as_done.subsample(3, 3)  
-Button(root, image=small_mark_as_done, bd=0).pack(side=RIGHT, pady=10, padx = 50)
+mark_as_done_button = PhotoImage(file="tick.png")
+small_mark_as_done = mark_as_done_button.subsample(3, 3)  
+button_mark_as_done = Button(root, image=small_mark_as_done, bd=0, command = mark_as_done )
+button_mark_as_done.pack(side=RIGHT, pady=10, padx = 50)
 
 #pomodoro button
 pomodoro_icon = PhotoImage(file="timer icon.png")
@@ -82,6 +103,11 @@ Button(root, image=small_pomodoro_icon, bd=0,).place(x=60, y= 90)
 progress_icon = PhotoImage(file="progress.png")
 small_progress_icon = progress_icon.subsample(6, 6)
 Button(root, image=small_progress_icon, bd=0,).place(x=240, y= 90)
+
+#score label
+score = 0
+score_label = Label(root, text=str(score), font="arial 14 bold", fg="black", bg="light blue")
+score_label.place(x=360, y=585)
 
 
 
