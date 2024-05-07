@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 import time
 import datetime
-import winsound
+import pygame
 
 
 def update_button_state():
@@ -21,6 +21,18 @@ def add_task():
             update_button_state()
     else:
         messagebox.showwarning("Warning", "Please enter a task.")
+
+
+def due_date(due_date_time,current_time):
+    current_time = datetime.datetime.now().strftime('%H:%M')
+    if current_time == due_date_time:
+        play_alarm()
+
+
+def play_alarm():
+    pygame.mixer.init()
+    pygame.mixer.music.load("BLIND.wav")
+    pygame.mixer.play()
 
 
 def remove_task():
