@@ -42,7 +42,11 @@ def run_timer():
     cycles = int(cycles_str.get())
 
     for cycle in range(cycles):
+<<<<<<< HEAD
         
+=======
+       
+>>>>>>> e93bd5fedb65284717951bfefe289bdd7e7e103a
         while total_pomodoro_seconds >= 0:
             minutes, seconds = divmod(total_pomodoro_seconds, 60)
 
@@ -56,7 +60,11 @@ def run_timer():
 
             total_pomodoro_seconds -= 1
 
+<<<<<<< HEAD
         
+=======
+     
+>>>>>>> e93bd5fedb65284717951bfefe289bdd7e7e103a
         while total_break_seconds >= 0:
             minutes, seconds = divmod(total_break_seconds, 60)
 
