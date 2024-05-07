@@ -3,11 +3,18 @@ from tkinter import messagebox
 import time
 import datetime
 import pygame
-
+from emran import *
 
 def update_button_state():
     has_undone_tasks = any(not task.endswith("\u2713") for task in listbox.get(0, END))
     button_mark_as_done.config(state=NORMAL if has_undone_tasks else DISABLED)
+
+
+def open_pomodoro_timer():
+    pomodoro_window = Toplevel(root)
+    pomodoro_window.title("Pomodoro timer")
+    pomodoro_window.geometry("500x400")
+    PomodoroTimer(pomodoro_window)
 
 
 def add_task():
@@ -85,7 +92,7 @@ Label(root, image=dockImage, bg="#32405b").place(x=30, y=25)
 noteImage = PhotoImage(file="task.png")
 Label(root, image=noteImage, bg="#32405b").place(x=30, y=25)
 
-heading = Label(root, text="PLANNER", font="arial 20 bold", fg="white", bg="light blue")
+heading = Label(root, text="PLANNER", font="arial 20 bold")
 heading.place(x=130, y=20)
 
 # main
@@ -144,7 +151,7 @@ score_label.place(x=360, y=585)
 # pomodoro button
 pomodoro_icon = PhotoImage(file="timer icon.png")
 small_pomodoro_icon = pomodoro_icon.subsample(6, 6)
-Button(root, image=small_pomodoro_icon, bd=0, ).place(x=60, y=90)
+Button(root, image=small_pomodoro_icon, bd=0,command = open_pomodoro_timer ).place(x=60, y=90)
 
 # Progress button
 progress_icon = PhotoImage(file="progress.png")
