@@ -1,4 +1,4 @@
-import time
+import time # lkjsdflaksdjf
 from tkinter import *
 from tkinter import messagebox
 
