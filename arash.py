@@ -18,6 +18,11 @@ class MusicPlayer:
         self.create_widgets()
 
     def create_widgets(self):
+        # Background Image
+        bg_image = tk.PhotoImage(file="bglofi3.png")
+        bg_label = tk.Label(self.master, image=bg_image)
+        bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+
         # Buttons/Labels
         self.track_label = Label(self.master, text="No Track Playing",  width=40, bg="black", font=("Arial", 10), fg="pink")
         self.track_label.grid(row=0, column=0, columnspan=3)
@@ -33,6 +38,8 @@ class MusicPlayer:
 
         self.prev_button = Button(self.master, text="Previous", command=self.prev_track, bg="black", fg="pink", font=("Arial", 12))
         self.prev_button.place(x=220, y=180)
+
+        self.bg_image = bg_image
 
     def add_track(self):
         file_path = filedialog.askopenfilename(filetypes=[("Audio files", "*.mp3")])
@@ -78,9 +85,7 @@ def main() :
     root = tk.Tk()
     root.resizable(False,False)
     app = MusicPlayer(root)
-    root.geometry("300x230")
-    # Background
-    root.configure(bg="pink")
+    root.geometry("300x215")
     root.mainloop()
 
 main()
