@@ -20,9 +20,9 @@ def open_pomodoro_timer():
 def add_task():
     task_text = task_entry.get()
     if task_text:
-        due_date_time = f"{hour_spinbox_due.get().zfill(2)}:{minute_spinbox_due.get().zfill(2)}"
-        if due_date_time:
-            task_text += f" (Due: {due_date_time})"
+        start_time = f"{hour_spinbox_due.get().zfill(2)}:{minute_spinbox_due.get().zfill(2)}"
+        if start_time:
+            task_text += f" (Due: {start_time})"
             listbox.insert(END, task_text)
             task_entry.delete(0, END)
             update_button_state()
