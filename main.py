@@ -5,9 +5,26 @@ import datetime
 import pygame
 from emran import *
 
+
 def update_button_state():
     has_undone_tasks = any(not task.endswith("\u2713") for task in listbox.get(0, END))
     button_mark_as_done.config(state=NORMAL if has_undone_tasks else DISABLED)
+
+
+def early_score(early_points):
+    global early_scores
+    early_scores += early_points
+
+
+def calculate_productivity():
+    global early_scores
+    global score
+    if early_scores > 0:
+        percentage = (score / early_scores) * 100
+        percentage_label.config(text=f"Productivity: {percentage:.2f}%")
+    else:
+        percentage_label.config(text="Productivity: N/A")
+
 
 
 def open_pomodoro_timer():
@@ -22,24 +39,26 @@ def add_task():
     if task_text:
         start_time = f"{hour_spinbox_due.get().zfill(2)}:{minute_spinbox_due.get().zfill(2)}"
         if start_time:
-            task_text += f" (Due: {start_time})"
+            task_text += f" (At: {start_time})"
             listbox.insert(END, task_text)
             task_entry.delete(0, END)
             update_button_state()
+            early_score(1)
+            if percentage_label.cget("text") == "Productivity: 100.00%":
+                pass
+            else:
+                calculate_productivity()
+            current_time = datetime.datetime.now().strftime('%H:%M')
+            if current_time == start_time:
+                play_alarm()
     else:
         messagebox.showwarning("Warning", "Please enter a task.")
-
-
-def due_date(due_date_time,current_time):
-    current_time = datetime.datetime.now().strftime('%H:%M')
-    if current_time == due_date_time:
-        play_alarm()
 
 
 def play_alarm():
     pygame.mixer.init()
     pygame.mixer.music.load("BLIND.wav")
-    pygame.mixer.play()
+    pygame.mixer.music.play()
 
 
 def remove_task():
@@ -47,6 +66,7 @@ def remove_task():
     if selected_task_index:
         listbox.delete(selected_task_index)
         update_button_state()
+        early_score(-1 )
     else:
         messagebox.showwarning("Please select a task to remove")
 
@@ -63,6 +83,7 @@ def mark_as_done():
                     listbox.insert(index, completed_task)
                     update_score(1)
                     update_button_state()
+                    calculate_productivity()
                     break
                 else:
                     button_mark_as_done.config(state=NORMAL)
@@ -92,8 +113,8 @@ Label(root, image=dockImage, bg="#32405b").place(x=30, y=25)
 noteImage = PhotoImage(file="task.png")
 Label(root, image=noteImage, bg="#32405b").place(x=30, y=25)
 
-heading = Label(root, text="PLANNER", font="arial 20 bold")
-heading.place(x=130, y=20)
+heading = Label(root, text="PLANNER", font="arial 20 bold",bg="#32405b")
+heading.place(x=135, y=20)
 
 # main
 frame = Frame(root, width=400, height=50, bg="white")
@@ -105,7 +126,7 @@ task_entry = Entry(frame, width=12, font="arial 10", bd=0)
 task_entry.place(x=60, y=10)
 
 # Due date entry button
-Label(frame, text="Due Date:", font="arial 10", bg="white").place(x=230, y=7)
+Label(frame, text="Starting:", font="arial 10", bg="white").place(x=230, y=7)
 hour_spinbox_due = Spinbox(frame, from_=0, to=23, width=2)
 hour_spinbox_due.place(x=300, y=10)
 Label(frame, text=":", font="arial 10", bg="white").place(x=290, y=7)
@@ -148,14 +169,25 @@ score = 0
 score_label = Label(root, text=str(score), font="arial 14 bold", fg="black", bg="light blue")
 score_label.place(x=360, y=585)
 
+early_scores = 0
+percentage_label = Label(root, text="Productivity: N/A", font="arial 14 bold", fg="black", bg="light blue")
+percentage_label.place(x=180, y=585)
+
+
 # pomodoro button
 pomodoro_icon = PhotoImage(file="timer icon.png")
 small_pomodoro_icon = pomodoro_icon.subsample(6, 6)
-Button(root, image=small_pomodoro_icon, bd=0,command = open_pomodoro_timer ).place(x=60, y=90)
+Button(root, image=small_pomodoro_icon, bd=0,command = open_pomodoro_timer ).place(x=40, y=90)
+
+# planner button
+planner_icon = PhotoImage(file="planner.png")
+small_planner_icon = planner_icon.subsample(6, 6)
+Button(root, image=small_planner_icon, bd=0 ).place(x=150, y=90)
 
 # Progress button
+early_scores = 0
 progress_icon = PhotoImage(file="progress.png")
 small_progress_icon = progress_icon.subsample(6, 6)
-Button(root, image=small_progress_icon, bd=0, ).place(x=240, y=90)
+Button(root, image=small_progress_icon, bd=0, ).place(x=280, y=90)
 
 root.mainloop()
