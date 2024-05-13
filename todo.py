@@ -2,9 +2,11 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from PIL import Image, ImageTk
+import time
 import datetime
 import pygame
 from emran import *
+from tracker import *
 
 
 def update_button_state():
@@ -25,7 +27,6 @@ def calculate_productivity():
         percentage_label.config(text=f"Productivity: {percentage:.2f}%")
     else:
         percentage_label.config(text="Productivity: N/A")
-
 
 
 def open_pomodoro_timer():
@@ -96,67 +97,12 @@ def update_score(points):
     score_label.config(text=str(score))
 
 
-def open_progress_tracker():
-    progress_tracker_window = Toplevel(root)
-    progress_tracker_window.title("Progress Tracker")
-    progress_tracker_window.geometry("400x650+400+100")
-    progress_tracker_window.resizable(False, False)
-    ProgressTracker(progress_tracker_window)
-
-
-def open_progress_tracker():
-    root = Tk()
-    app = ProgressTracker(root)
-    root.mainloop()
-
-
-class ProgressTracker:
-    def __init__(self, master):
-        self.master = master
-        master.title("To-do list")
-        master.geometry("400x650+400+100")
-        master.resizable(False, False)
-
-
-        self.TopImage = PhotoImage(file="topbar.png")
-        Label(master, image=self.TopImage).pack()
-
-        self.dockImage = PhotoImage(file="dock.png")
-        Label(master, image=self.dockImage, bg="#32405b").place(x=30, y=25)
-
-        self.noteImage = PhotoImage(file="task.png")
-        Label(master, image=self.noteImage, bg="#32405b").place(x=30, y=25)
-
-        heading = Label(master, text="PROGRESS", font="arial 20 bold", bg="#32405b")
-        heading.place(x=125, y=20)
-
-        # pomodoro button
-        self.pomodoro_icon = PhotoImage(file="timer icon.png")
-        Button(master, image=self.pomodoro_icon, bd=0).place(x=30, y=90)
-
-        # planner button
-        self.planner_icon = PhotoImage(file="planner.png")
-        Button(master, image=self.planner_icon, bd=0).place(x=145, y=90)
-
-        # Progress button
-        self.progress_icon = PhotoImage(file="progress.png")
-        Button(master, image=self.progress_icon, bd=0).place(x=270, y=90)
-
-        # Progress bar
-        self.progress_var = DoubleVar()
-        self.progress_bar = ttk.Progressbar(master, orient=HORIZONTAL, length=300, mode="determinate", variable=self.progress_var)
-        self.progress_bar.place(x=50, y=300)
-
-        # Progress percentage label
-        self.progress_label = Label(master, text="", font="arial 12")
-        self.progress_label.place(x=200, y=350)
-
-        self.update_progress(100)
-
-    
-    def update_progress(self, percentage):
-        self.progress_var.set(percentage)
-        self.progress_label.config(text=f"{percentage}%")
+def tracker_window():
+    tracker_window = Toplevel(root)
+    tracker_window.title("To-do list")
+    tracker_window.geometry("400x650+400+100")
+    tracker_window.resizable(False,False)
+    ProgressTracker(tracker_window)
 
 
 root = Tk()
@@ -164,7 +110,9 @@ root.title("To-do list")
 root.geometry("400x650+400+100")
 root.resizable(False,False)
 
-
+# icon
+Image_icon = PhotoImage(file="task.png")  # image not popping out
+root.iconphoto(False, Image_icon)
 
 TopImage = PhotoImage(file="topbar.png")
 Label(root, image=TopImage).pack()
@@ -249,14 +197,6 @@ Button(root, image=small_planner_icon, bd=0 ).place(x=150, y=90)
 early_scores = 0
 progress_icon = PhotoImage(file="progress.png")
 small_progress_icon = progress_icon.subsample(6, 6)
-Button(root, image=small_progress_icon, bd=0,command = open_progress_tracker ).place(x=280, y=90)
+Button(root, image=small_progress_icon, bd=0,command = tracker_window ).place(x=280, y=90)
 
 root.mainloop()
-
-
-
-
-
-
-
-
