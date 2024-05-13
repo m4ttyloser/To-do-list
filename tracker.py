@@ -104,11 +104,10 @@ def open_progress_tracker():
     ProgressTracker(progress_tracker_window)
 
 
-def open_progress_tracker():
+def open_progress_tracker_window():
     root = Tk()
-    app = ProgressTracker(root)
+    progress_tracker_window = ProgressTracker(root)
     root.mainloop()
-
 
 class ProgressTracker:
     def __init__(self, master):
@@ -117,29 +116,35 @@ class ProgressTracker:
         master.geometry("400x650+400+100")
         master.resizable(False, False)
 
+        # icon
+        self.Image_icon = PhotoImage(file="task.png")
+        master.iconphoto(False, Image_icon)
 
         self.TopImage = PhotoImage(file="topbar.png")
-        Label(master, image=self.TopImage).pack()
+        Label(master, image=TopImage).pack()
 
         self.dockImage = PhotoImage(file="dock.png")
-        Label(master, image=self.dockImage, bg="#32405b").place(x=30, y=25)
+        self.dockImage = self.dockImage.subsample(2)  
 
         self.noteImage = PhotoImage(file="task.png")
-        Label(master, image=self.noteImage, bg="#32405b").place(x=30, y=25)
+        self.noteImage = self.noteImage.subsample(2) 
 
         heading = Label(master, text="PROGRESS", font="arial 20 bold", bg="#32405b")
         heading.place(x=125, y=20)
 
         # pomodoro button
         self.pomodoro_icon = PhotoImage(file="timer icon.png")
-        Button(master, image=self.pomodoro_icon, bd=0).place(x=30, y=90)
+        self.pomodoro_icon = self.pomodoro_icon.subsample(5)  
+        Button(master, image=self.pomodoro_icon, bd=0, command = open_pomodoro_timer).place(x=25, y=90)
 
         # planner button
         self.planner_icon = PhotoImage(file="planner.png")
+        self.planner_icon = self.planner_icon.subsample(5) 
         Button(master, image=self.planner_icon, bd=0).place(x=145, y=90)
 
         # Progress button
         self.progress_icon = PhotoImage(file="progress.png")
+        self.progress_icon = self.progress_icon.subsample(5) 
         Button(master, image=self.progress_icon, bd=0).place(x=270, y=90)
 
         # Progress bar
@@ -151,7 +156,7 @@ class ProgressTracker:
         self.progress_label = Label(master, text="", font="arial 12")
         self.progress_label.place(x=200, y=350)
 
-        self.update_progress(100)
+        self.update_progress()
 
     
     def update_progress(self, percentage):
@@ -164,7 +169,9 @@ root.title("To-do list")
 root.geometry("400x650+400+100")
 root.resizable(False,False)
 
-
+# icon
+Image_icon = PhotoImage(file="task.png")  # image not popping out
+root.iconphoto(False, Image_icon)
 
 TopImage = PhotoImage(file="topbar.png")
 Label(root, image=TopImage).pack()
