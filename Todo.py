@@ -35,6 +35,12 @@ def open_pomodoro_timer():
     PomodoroTimer(pomodoro_window)
 
 
+def progress_tracker():
+    root = Tk()
+    pprogress_tracker_window = ProgressTracker(root)
+    root.mainloop()
+
+
 def add_task():
     task_text = task_entry.get()
     if task_text:
@@ -96,73 +102,59 @@ def update_score(points):
     score_label.config(text=str(score))
 
 
-def open_progress_tracker():
-    progress_tracker_window = Toplevel(root)
-    progress_tracker_window.title("Progress Tracker")
-    progress_tracker_window.geometry("400x650+400+100")
-    progress_tracker_window.resizable(False, False)
-    ProgressTracker(progress_tracker_window)
-
-
-def open_progress_tracker_window():
-    root = Tk()
-    progress_tracker_window = ProgressTracker(root)
-    root.mainloop()
-
 class ProgressTracker:
     def __init__(self, master):
         self.master = master
-        master.title("To-do list")
-        master.geometry("400x650+400+100")
-        master.resizable(False, False)
+        master.title("Productivity tracker")
+        master.geometry("500x500")
+        master.configure(background = "lightblue")
 
-        # icon
-        self.Image_icon = PhotoImage(file="task.png")
-        master.iconphoto(False, Image_icon)
+        self.label = Label(master, text="Productivity:")
+        self.label.pack(pady=10)
 
-        self.TopImage = PhotoImage(file="topbar.png")
-        Label(master, image=TopImage).pack()
-
-        self.dockImage = PhotoImage(file="dock.png")
-        self.dockImage = self.dockImage.subsample(2)  
-
-        self.noteImage = PhotoImage(file="task.png")
-        self.noteImage = self.noteImage.subsample(2) 
-
-        heading = Label(master, text="PROGRESS", font="arial 20 bold", bg="#32405b")
-        heading.place(x=125, y=20)
-
-        # pomodoro button
-        self.pomodoro_icon = PhotoImage(file="timer icon.png")
-        self.pomodoro_icon = self.pomodoro_icon.subsample(5)  
-        Button(master, image=self.pomodoro_icon, bd=0, command = open_pomodoro_timer).place(x=25, y=90)
-
-        # planner button
-        self.planner_icon = PhotoImage(file="planner.png")
-        self.planner_icon = self.planner_icon.subsample(5) 
-        Button(master, image=self.planner_icon, bd=0).place(x=145, y=90)
-
-        # Progress button
-        self.progress_icon = PhotoImage(file="progress.png")
-        self.progress_icon = self.progress_icon.subsample(5) 
-        Button(master, image=self.progress_icon, bd=0).place(x=270, y=90)
-
-        # Progress bar
         self.progress_var = DoubleVar()
-        self.progress_bar = ttk.Progressbar(master, orient=HORIZONTAL, length=300, mode="determinate", variable=self.progress_var)
-        self.progress_bar.place(x=50, y=300)
+        self.progress_bar = ttk.Progressbar(master, orient="horizontal", length=300, mode="determinate", variable=self.progress_var)
+        self.progress_bar.pack(pady=10)
 
-        # Progress percentage label
-        self.progress_label = Label(master, text="", font="arial 12")
-        self.progress_label.place(x=200, y=350)
+        self.progress_label = Label(master, text="0%")
+        self.progress_label.pack(pady=5)
 
-        self.update_progress()
+        self.progress_button = Button(master, text="Show rate")
+        self.progress_button.pack(pady=10)
 
-    
-    def update_progress(self, percentage):
-        self.progress_var.set(percentage)
-        self.progress_label.config(text=f"{percentage}%")
+        self.wisdom_label = Label(master, text="Words of wisdom")
+        self.wisdom_label.place(x=200,y=270)
 
+        self.canvas = Canvas(master, width=400, height=200, bg="lightblue", highlightthickness=0)
+        self.canvas.place(x= 50,y=290)
+
+        self.canvas.create_text(200, 100, text="Motivational", font=("Arial", 16), fill="white")
+
+        self.create_rounded_rectangle(20, 20, 380, 180, 20, outline="#333333", fill="black")
+
+    def create_rounded_rectangle(self, x1, y1, x2, y2, radius=25, **kwargs):
+        points = [x1 + radius, y1,
+                  x1 + radius, y1,
+                  x2 - radius, y1,
+                  x2 - radius, y1,
+                  x2, y1,
+                  x2, y1 + radius,
+                  x2, y1 + radius,
+                  x2, y2 - radius,
+                  x2, y2 - radius,
+                  x2, y2,
+                  x2 - radius, y2,
+                  x2 - radius, y2,
+                  x1 + radius, y2,
+                  x1 + radius, y2,
+                  x1, y2,
+                  x1, y2 - radius,
+                  x1, y2 - radius,
+                  x1, y1 + radius,
+                  x1, y1 + radius,
+                  x1, y1]
+
+        return self.canvas.create_polygon(points, smooth=True, **kwargs)
 
 root = Tk()
 root.title("To-do list")
@@ -250,13 +242,13 @@ Button(root, image=small_pomodoro_icon, bd=0,command = open_pomodoro_timer ).pla
 # planner button
 planner_icon = PhotoImage(file="planner.png")
 small_planner_icon = planner_icon.subsample(6, 6)
-Button(root, image=small_planner_icon, bd=0 ).place(x=150, y=90)
+Label(root, image=small_planner_icon, bd=0 ).place(x=150, y=90)
 
 # Progress button
 early_scores = 0
 progress_icon = PhotoImage(file="progress.png")
 small_progress_icon = progress_icon.subsample(6, 6)
-Button(root, image=small_progress_icon, bd=0,command = open_progress_tracker ).place(x=280, y=90)
+Button(root, image=small_progress_icon, bd=0,command = progress_tracker).place(x=280, y=90)
 
 root.mainloop()
 
