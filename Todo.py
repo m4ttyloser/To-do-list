@@ -17,15 +17,18 @@ def early_score(early_points):
     early_scores += early_points
 
 
-def calculate_productivity():
+def calculate_productivity(progress_tracker=None):
     global early_scores
     global score
     if early_scores > 0:
         percentage = (score / early_scores) * 100
         percentage_label.config(text=f"Productivity: {percentage:.2f}%")
+        if progress_tracker:
+            progress_tracker.update_progress(percentage)
     else:
         percentage_label.config(text="Productivity: N/A")
-
+        if progress_tracker:
+            progress_tracker.update_progress(0)
 
 
 def open_pomodoro_timer():
@@ -36,9 +39,10 @@ def open_pomodoro_timer():
 
 
 def open_progress_tracker():
-    root = Tk()
-    pprogress_tracker_window = ProgressTracker(root)
-    root.mainloop()
+    progress_tracker_window = Toplevel(root)
+    progress_tracker = ProgressTracker(progress_tracker_window)
+    calculate_productivity(progress_tracker)
+    progress_tracker_window.mainloop()
 
 
 def add_task():
@@ -64,7 +68,7 @@ def add_task():
 
 def play_alarm():
     pygame.mixer.init()
-    pygame.mixer.music.load("BLIND.mp3")
+    pygame.mixer.music.load("BLIND.wav")
     pygame.mixer.music.play()
 
 
@@ -73,9 +77,10 @@ def remove_task():
     if selected_task_index:
         listbox.delete(selected_task_index)
         update_button_state()
-        early_score(-1 )
+        early_score(-1)
     else:
         messagebox.showwarning("Please select a task to remove")
+
 
 def mark_as_done():
     selected_task_indices = listbox.curselection()
@@ -85,7 +90,7 @@ def mark_as_done():
             if isinstance(selected_task, str):
                 if not selected_task.endswith("\u2713"):
                     completed_task = selected_task + " \u2713"  # Unicode for checkmark symbol
-                    listbox.itemconfig(index, {'bg':'light grey', 'fg':'grey'})
+                    listbox.itemconfig(index, {'bg': 'light grey', 'fg': 'grey'})
                     listbox.delete(index)
                     listbox.insert(index, completed_task)
                     update_score(1)
@@ -94,6 +99,7 @@ def mark_as_done():
                     break
                 else:
                     button_mark_as_done.config(state=NORMAL)
+
 
 # Function to update the score
 def update_score(points):
@@ -107,7 +113,7 @@ class ProgressTracker:
         self.master = master
         master.title("Productivity tracker")
         master.geometry("500x500")
-        master.configure(background = "lightblue")
+        master.configure(background="lightblue")
 
         self.label = Label(master, text="Productivity:")
         self.label.pack(pady=10)
@@ -119,14 +125,11 @@ class ProgressTracker:
         self.progress_label = Label(master, text="0%")
         self.progress_label.pack(pady=5)
 
-        self.progress_button = Button(master, text="Show rate")
-        self.progress_button.pack(pady=10)
-
         self.wisdom_label = Label(master, text="Words of wisdom")
-        self.wisdom_label.place(x=200,y=270)
+        self.wisdom_label.place(x=200, y=270)
 
         self.canvas = Canvas(master, width=400, height=200, bg="lightblue", highlightthickness=0)
-        self.canvas.place(x= 50,y=290)
+        self.canvas.place(x=50, y=290)
 
         self.canvas.create_text(200, 100, text="Motivational", font=("Arial", 16), fill="white")
 
@@ -156,10 +159,15 @@ class ProgressTracker:
 
         return self.canvas.create_polygon(points, smooth=True, **kwargs)
 
+    def update_progress(self, percentage):
+        self.progress_var.set(percentage)
+        self.progress_label.config(text=f"{percentage:.2f}%")
+
+
 root = Tk()
 root.title("To-do list")
 root.geometry("400x650+400+100")
-root.resizable(False,False)
+root.resizable(False, False)
 
 # icon
 Image_icon = PhotoImage(file="task.png")  # image not popping out
@@ -174,7 +182,7 @@ Label(root, image=dockImage, bg="#32405b").place(x=30, y=25)
 noteImage = PhotoImage(file="task.png")
 Label(root, image=noteImage, bg="#32405b").place(x=30, y=25)
 
-heading = Label(root, text="PLANNER", font="arial 20 bold",bg="#32405b")
+heading = Label(root, text="PLANNER", font="arial 20 bold", bg="#32405b")
 heading.place(x=135, y=20)
 
 # main
@@ -208,7 +216,7 @@ frame1 = Frame(root, bd=3, width=700, height=280, bg="blue")
 frame1.pack(pady=(160, 0))
 
 # task list
-listbox = Listbox(frame1, font=("arial", 12), width=40, height=16, bg="pink", fg="black", cursor="hand2",selectbackground="black")
+listbox = Listbox(frame1, font=("arial", 12), width=40, height=16, bg="pink", fg="black", cursor="hand2", selectbackground="black")
 listbox.pack(side=LEFT, fill=BOTH, padx=2)
 scrollbar = Scrollbar(frame1)
 scrollbar.pack(side=RIGHT, fill=BOTH)
@@ -232,30 +240,22 @@ score_label.place(x=360, y=585)
 
 early_scores = 0
 percentage_label = Label(root, text="Productivity: N/A", font="arial 14 bold", fg="black", bg="light blue")
-percentage_label.place(x=180, y=585)
+percentage_label.place(x=120, y=585)
 
 # pomodoro button
 pomodoro_icon = PhotoImage(file="timer icon.png")
 small_pomodoro_icon = pomodoro_icon.subsample(6, 6)
-Button(root, image=small_pomodoro_icon, bd=0,command = open_pomodoro_timer ).place(x=40, y=90)
+Button(root, image=small_pomodoro_icon, bd=0, command=open_pomodoro_timer).place(x=40, y=90)
 
 # planner button
 planner_icon = PhotoImage(file="planner.png")
 small_planner_icon = planner_icon.subsample(6, 6)
-Label(root, image=small_planner_icon, bd=0 ).place(x=150, y=90)
+Label(root, image=small_planner_icon, bd=0).place(x=150, y=90)
 
 # Progress button
 early_scores = 0
 progress_icon = PhotoImage(file="progress.png")
 small_progress_icon = progress_icon.subsample(6, 6)
-Button(root, image=small_progress_icon, bd=0,command = open_progress_tracker).place(x=280, y=90)
+Button(root, image=small_progress_icon, bd=0, command=open_progress_tracker).place(x=280, y=90)
 
 root.mainloop()
-
-
-
-
-
-
-
-
