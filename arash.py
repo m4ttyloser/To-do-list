@@ -14,7 +14,6 @@ class MusicPlayer:
             "love of my life.mp3",
             "total eclipse of the heart.mp3",
             "goodnight dad.mp3"
-            # Add more songs as needed
         ]
 
         self.playlist = []
@@ -59,7 +58,7 @@ class MusicPlayer:
         if self.playlist:
             if not pygame.mixer.music.get_busy() or self.paused:
                 if self.paused:
-                    pygame.mixer.music.unpause()  # Resume from paused position
+                    pygame.mixer.music.unpause()
                 else:
                     pygame.mixer.music.load(self.playlist[self.current_track])
                     pygame.mixer.music.play()
@@ -67,19 +66,19 @@ class MusicPlayer:
                 self.play_pause_button.config(text="Pause")
                 self.paused = False
             else:
-                pygame.mixer.music.pause()  # Pause the music
-                self.paused_time = pygame.mixer.music.get_pos() / 1000  # Store the paused time
+                pygame.mixer.music.pause()
+                self.paused_time = pygame.mixer.music.get_pos() / 1000
                 self.paused = True
                 self.track_label.config(text="Music Paused")
                 self.play_pause_button.config(text="Play")
-        else:  # If there are no tracks in the playlist, play a built-in song
+        else: 
             if not pygame.mixer.music.get_busy() or self.paused:
-                self.play_builtin_song(0)  # Change the index as needed for different built-in songs
+                self.play_builtin_song(0) 
                 self.play_pause_button.config(text="Pause")
                 self.paused = False
             else:
                 pygame.mixer.music.pause()
-                self.paused_time = pygame.mixer.music.get_pos() / 1000  # Store the paused time
+                self.paused_time = pygame.mixer.music.get_pos() / 1000 
                 self.paused = True
                 self.track_label.config(text="Music Paused")
                 self.play_pause_button.config(text="Play")
@@ -115,9 +114,8 @@ class MusicPlayer:
             self.play_builtin_song(self.current_track)
             self.update_background()
 
-    def update_background(self):
-        # Update background image here
-        bg_images = ["bglofi3.png", "mountains.png", "spaceshit.png", "spaceshit2.png", "thumb.png"]  # Add more images as needed
+    def update_background(self): 
+        bg_images = ["bglofi3.png", "mountains.png", "spaceshit.png", "spaceshit2.png", "thumb.png"]
         self.bg_image = tk.PhotoImage(file=bg_images[self.current_track % len(bg_images)])
         self.bg_label.config(image=self.bg_image)
 
