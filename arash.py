@@ -8,6 +8,15 @@ class MusicPlayer:
         self.master = master
         master.title("Music Player")
 
+        self.builtin_songs = [
+            "sleepwalk.mp3",
+            "where is my mind.mp3",
+            "love of my life.mp3",
+            "total eclipse of the heart.mp3",
+            "goodnight dad.mp3"
+            # Add more songs as needed
+        ]
+
         self.playlist = []
         self.current_track = 0
         self.paused = False
@@ -16,19 +25,24 @@ class MusicPlayer:
         pygame.init()
 
         self.create_widgets()
+    
+    def play_builtin_song(self, song_index):
+        pygame.mixer.music.load(self.builtin_songs[song_index])
+        pygame.mixer.music.play()
+        self.track_label.config(text="Now Playing: " + self.builtin_songs[song_index])
+        self.play_pause_button.config(text="Pause")
+        self.paused = False
+
 
     def create_widgets(self):
         # Background Image
         bg_image = tk.PhotoImage(file="bglofi3.png")
-        bg_label = tk.Label(self.master, image=bg_image)
-        bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+        self.bg_label = tk.Label(self.master, image=bg_image)
+        self.bg_label.place(x=0, y=0, relwidth=1, relheight=1)
 
         # Buttons/Labels
         self.track_label = Label(self.master, text="No Track Playing",  width=40, bg="black", font=("Arial", 10), fg="pink")
         self.track_label.grid(row=0, column=0, columnspan=3)
-
-        self.add_button = Button(self.master, text="Add", command=self.add_track, bg="black", fg="pink", font=("Arial", 12))
-        self.add_button.place(x=257, y=22)
 
         self.play_pause_button = Button(self.master, text="Play", command=self.play_pause, bg="black", fg="pink", font=("Arial", 12))
         self.play_pause_button.place(x=135, y=180)
@@ -41,47 +55,73 @@ class MusicPlayer:
 
         self.bg_image = bg_image
 
-    def add_track(self):
-        file_path = filedialog.askopenfilename(filetypes=[("Audio files", "*.mp3")])
-        if file_path:
-            self.playlist.append(file_path)
-
     def play_pause(self):
         if self.playlist:
             if not pygame.mixer.music.get_busy() or self.paused:
-                pygame.mixer.music.load(self.playlist[self.current_track])
-                pygame.mixer.music.play(start=self.paused_time)
+                if self.paused:
+                    pygame.mixer.music.unpause()  # Resume from paused position
+                else:
+                    pygame.mixer.music.load(self.playlist[self.current_track])
+                    pygame.mixer.music.play()
                 self.track_label.config(text="Now Playing: " + self.playlist[self.current_track])
                 self.play_pause_button.config(text="Pause")
                 self.paused = False
             else:
-                self.paused_time = pygame.mixer.music.get_pos() / 1000  # Get the elapsed time in seconds
+                pygame.mixer.music.pause()  # Pause the music
+                self.paused_time = pygame.mixer.music.get_pos() / 1000  # Store the paused time
+                self.paused = True
+                self.track_label.config(text="Music Paused")
+                self.play_pause_button.config(text="Play")
+        else:  # If there are no tracks in the playlist, play a built-in song
+            if not pygame.mixer.music.get_busy() or self.paused:
+                self.play_builtin_song(0)  # Change the index as needed for different built-in songs
+                self.play_pause_button.config(text="Pause")
+                self.paused = False
+            else:
                 pygame.mixer.music.pause()
+                self.paused_time = pygame.mixer.music.get_pos() / 1000  # Store the paused time
                 self.paused = True
                 self.track_label.config(text="Music Paused")
                 self.play_pause_button.config(text="Play")
 
+
     def next_track(self):
         if self.playlist:
             self.current_track = (self.current_track + 1) % len(self.playlist)
+            self.update_background()
             self.paused_time = 0
             pygame.mixer.music.load(self.playlist[self.current_track])
             pygame.mixer.music.play()
             self.track_label.config(text="Now Playing: " + self.playlist[self.current_track])
             self.play_pause_button.config(text="Pause")
             self.paused = False
+        else:
+            self.current_track = (self.current_track + 1) % len(self.builtin_songs)
+            self.play_builtin_song(self.current_track)
+            self.update_background()
 
     def prev_track(self):
         if self.playlist:
             self.current_track = (self.current_track - 1) % len(self.playlist)
+            self.update_background()
             self.paused_time = 0
             pygame.mixer.music.load(self.playlist[self.current_track])
             pygame.mixer.music.play()
             self.track_label.config(text="Now Playing: " + self.playlist[self.current_track])
             self.play_pause_button.config(text="Pause")
             self.paused = False
+        else:
+            self.current_track = (self.current_track - 1) % len(self.builtin_songs)
+            self.play_builtin_song(self.current_track)
+            self.update_background()
 
-def main() :
+    def update_background(self):
+        # Update background image here
+        bg_images = ["bglofi3.png", "mountains.png", "spaceshit.png", "spaceshit2.png", "thumb.png"]  # Add more images as needed
+        self.bg_image = tk.PhotoImage(file=bg_images[self.current_track % len(bg_images)])
+        self.bg_label.config(image=self.bg_image)
+
+def main():
     root = tk.Tk()
     root.resizable(False,False)
     app = MusicPlayer(root)
@@ -89,3 +129,4 @@ def main() :
     root.mainloop()
 
 main()
+
