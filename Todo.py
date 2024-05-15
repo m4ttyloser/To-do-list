@@ -35,7 +35,7 @@ def open_pomodoro_timer():
     PomodoroTimer(pomodoro_window)
 
 
-def progress_tracker():
+def open_progress_tracker():
     root = Tk()
     pprogress_tracker_window = ProgressTracker(root)
     root.mainloop()
@@ -64,7 +64,7 @@ def add_task():
 
 def play_alarm():
     pygame.mixer.init()
-    pygame.mixer.music.load("BLIND.wav")
+    pygame.mixer.music.load("BLIND.mp3")
     pygame.mixer.music.play()
 
 
@@ -248,7 +248,7 @@ Label(root, image=small_planner_icon, bd=0 ).place(x=150, y=90)
 early_scores = 0
 progress_icon = PhotoImage(file="progress.png")
 small_progress_icon = progress_icon.subsample(6, 6)
-Button(root, image=small_progress_icon, bd=0,command = progress_tracker).place(x=280, y=90)
+Button(root, image=small_progress_icon, bd=0,command = open_progress_tracker).place(x=280, y=90)
 
 root.mainloop()
 
