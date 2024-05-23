@@ -1,9 +1,9 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
-from PIL import Image, ImageTk
 import datetime
 import pygame
+import sqlite3
 from emran import *
 
 
@@ -12,23 +12,43 @@ def update_button_state():
     button_mark_as_done.config(state=NORMAL if has_undone_tasks else DISABLED)
 
 
+def create_database():
+    conn = sqlite3.connect("productivity.db")
+    c = conn.cursor()
+    c.execute("""CREATE TABLE IF NOT EXISTS productivity(
+              date TEXT PRIMARY KEY,
+              percentage REAL
+    )""")
+    conn.commit()
+    conn.close()
+
+create_database()
+
+
+def save_productivity(percentage):
+    today = datetime.date.today()
+    conn = sqlite3.connect("productivity.db")
+    c = conn.cursor()
+    c.execute("INSERT OR REPLACE INTO productivity (date,percentage) VALUES (?,?)",(str(today),percentage))
+    conn.commit()
+    conn.close()
+
+
 def early_score(early_points):
     global early_scores
     early_scores += early_points
 
 
-def calculate_productivity(progress_tracker=None):
+def calculate_productivity():
     global early_scores
     global score
     if early_scores > 0:
         percentage = (score / early_scores) * 100
         percentage_label.config(text=f"Productivity: {percentage:.2f}%")
-        if progress_tracker:
-            progress_tracker.update_progress(percentage)
+        save_productivity(percentage)
     else:
         percentage_label.config(text="Productivity: N/A")
-        if progress_tracker:
-            progress_tracker.update_progress(0)
+        save_productivity(0)
 
 
 def open_pomodoro_timer():
@@ -41,8 +61,7 @@ def open_pomodoro_timer():
 def open_progress_tracker():
     progress_tracker_window = Toplevel(root)
     progress_tracker = ProgressTracker(progress_tracker_window)
-    calculate_productivity(progress_tracker)
-    progress_tracker_window.mainloop()
+    progress_tracker.show_productivity()
 
 
 def add_task():
@@ -68,7 +87,7 @@ def add_task():
 
 def play_alarm():
     pygame.mixer.init()
-    pygame.mixer.music.load("BLIND.wav")
+    pygame.mixer.music.load("BLIND.mp3")
     pygame.mixer.music.play()
 
 
@@ -113,22 +132,30 @@ class ProgressTracker:
         self.master = master
         master.title("Productivity tracker")
         master.geometry("500x500")
-        master.configure(background="lightblue")
 
-        self.label = Label(master, text="Productivity:")
-        self.label.pack(pady=10)
+        # Load the background image
+        self.background_image = PhotoImage(file="lof.png")  
+        self.background_label = Label(master, image=self.background_image)
+        self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
         self.progress_var = DoubleVar()
         self.progress_bar = ttk.Progressbar(master, orient="horizontal", length=300, mode="determinate", variable=self.progress_var)
         self.progress_bar.pack(pady=10)
 
-        self.progress_label = Label(master, text="0%")
+        self.progress_label = Label(master, text="0%", bg="lightblue")
         self.progress_label.pack(pady=5)
+
+        self.additional_progress_var = DoubleVar()
+        self.additional_progress_bar = ttk.Progressbar(master, orient="horizontal", length=300, mode="determinate", variable=self.additional_progress_var)
+        self.additional_progress_bar.pack(pady=10)
+
+        self.additional_progress_label = Label(master, text="0%")
+        self.additional_progress_label.pack(pady=5)
 
         self.wisdom_label = Label(master, text="Words of wisdom")
         self.wisdom_label.place(x=200, y=270)
 
-        self.canvas = Canvas(master, width=400, height=200, bg="lightblue", highlightthickness=0)
+        self.canvas = Canvas(master, width=400, height=200, highlightthickness=0)
         self.canvas.place(x=50, y=290)
 
         self.canvas.create_text(200, 100, text="Motivational", font=("Arial", 16), fill="white")
@@ -159,9 +186,28 @@ class ProgressTracker:
 
         return self.canvas.create_polygon(points, smooth=True, **kwargs)
 
-    def update_progress(self, percentage):
-        self.progress_var.set(percentage)
-        self.progress_label.config(text=f"{percentage:.2f}%")
+
+    def show_productivity(self):
+        today = datetime.date.today()
+        yesterday = today - datetime.timedelta(days=1)
+
+        conn = sqlite3.connect("productivity.db")
+        c = conn.cursor()
+
+        c.execute("SELECT percentage FROM productivity WHERE date = ?",(str(today),))
+        today_percentage = c.fetchone()
+        c.execute("SELECT percentage FROM productivity WHERE date = ?",(str(yesterday),))
+        yesterday_percentage = c.fetchone()
+
+        if today_percentage:
+            self.progress_var.set(today_percentage[0])
+            self.progress_label.config(text = f"{today_percentage[0]:.2f}%")
+
+        if yesterday_percentage:
+            self.additional_progress_var.set(yesterday_percentage[0])
+            self.additional_progress_label.config(text = f"{yesterday_percentage[0]:.2f}%")
+
+
 
 
 root = Tk()
@@ -257,5 +303,18 @@ early_scores = 0
 progress_icon = PhotoImage(file="progress.png")
 small_progress_icon = progress_icon.subsample(6, 6)
 Button(root, image=small_progress_icon, bd=0, command=open_progress_tracker).place(x=280, y=90)
+
+
+def view_database():
+    conn = sqlite3.connect("productivity.db")
+    c = conn.cursor()
+    c.execute("SELECT * FROM productivity")
+    rows = c.fetchall()
+    conn.close()
+
+    for row in rows:
+        print(row)
+
+view_database()
 
 root.mainloop()
