@@ -25,7 +25,9 @@ def create_database():
 
 create_database()
 
-create_database()
+
+score = 0
+early_scores = 0
 
 def update_button_state():
     has_undone_tasks = any(not task.endswith("\u2713") for task in listbox.get(0, END))
@@ -40,21 +42,15 @@ def calculate_productivity():
     global score
     if early_scores > 0:
         percentage = (score / early_scores) * 100
-        percentage_label.config(text=f"Productivity: {percentage:.2f}%")
     else:
         percentage = 0
-        percentage_label.config(text="Productivity: N/A")
     save_productivity(percentage, score, early_scores)
 
 def save_productivity(percentage, score, early_score):
     today = datetime.date.today()
     conn = sqlite3.connect("productivity.db")
     c = conn.cursor()
-    
-    # Delete existing tasks for today to avoid duplication
     c.execute("DELETE FROM productivity WHERE date = ?", (str(today),))
-
-    # Insert tasks individually
     tasks = listbox.get(0, END)
     for task in tasks:
         c.execute("INSERT INTO productivity (date, task, score, early_score, percentage) VALUES (?, ?, ?, ?, ?)",
@@ -84,10 +80,7 @@ def add_task():
             task_entry.delete(0, END)
             update_button_state()
             early_score(1)
-            if percentage_label.cget("text") == "Productivity: 100.00%":
-                pass
-            else:
-                calculate_productivity()
+            calculate_productivity()
             current_time = datetime.datetime.now().strftime('%H:%M')
             if current_time == start_time:
                 play_alarm()
@@ -133,7 +126,6 @@ def mark_as_done():
 def update_score(points):
     global score
     score += points
-    score_label.config(text=str(score))
     calculate_productivity()
 
 class ProgressTracker:
@@ -317,11 +309,6 @@ def load_productivity():
         for row in rows:
             task = row[0]
             listbox.insert(END, task)
-        score_label.config(text=str(score))
-        percentage_label.config(text=f"Productivity: {percentage:.2f}%")
-    else:
-        score_label.config(text="0")
-        percentage_label.config(text="Productivity: N/A")
 
 root = Tk()
 root.title("To-do list")
@@ -376,14 +363,6 @@ mark_as_done_button = PhotoImage(file="tick.png")
 small_mark_as_done = mark_as_done_button.subsample(3, 3)
 button_mark_as_done = Button(root, image=small_mark_as_done, bd=0, command=mark_as_done)
 button_mark_as_done.pack(side=RIGHT, pady=10, padx=50)
-
-score = 0
-score_label = Label(root, text=str(score), font="arial 14 bold", fg="black", bg="light blue")
-score_label.place(x=360, y=585)
-
-early_scores = 0
-percentage_label = Label(root, text="Productivity: N/A", font="arial 14 bold", fg="black", bg="light blue")
-percentage_label.place(x=120, y=585)
 
 pomodoro_icon = PhotoImage(file="timer icon.png")
 small_pomodoro_icon = pomodoro_icon.subsample(6, 6)
