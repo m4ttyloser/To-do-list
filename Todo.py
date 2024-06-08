@@ -4,6 +4,7 @@ from tkinter import messagebox
 import datetime
 import pygame
 import sqlite3
+import random
 from emran import *
 
 def create_database():
@@ -192,7 +193,21 @@ class ProgressTracker:
         self.canvas = Canvas(master, width=400, height=200, highlightthickness=0)
         self.canvas.place(x=50, y=290)
         self.create_rounded_rectangle(20, 20, 380, 180, 20, outline="#333333", fill="black")
-        self.canvas.create_text(200, 100, text="Motivational", font=("Arial", 16), fill="white")
+        
+        self.quote_text = self.canvas.create_text(200, 100, text="", font=("Arial", 16), fill="white", width=360)
+
+        self.quotes = [
+            "Quality is not an act, it’s a habit - Aristotle",
+            "When you have a dream, you’ve got to grab it and never let go - Carol Burnett",
+            "You were born to win. But to be a winner, you must plan to win, prepare to win, and expect to win. - Zig Ziglar",
+            "If your dreams don’t scare you, they are too small. - Richard Branson",
+            "Success is the sum of all efforts repeated day-in and day-out - Robert Collier",
+            "Motivation is what gets you started. Habit is what keeps you going - Jim Ryun",
+            "It does not matter how slow you go as long as you do not stop - Confucius",
+            "There are no secrets to success. It is the result of preparation, hard work, and learning from failure. - Colin Powell",
+            "Procrastination makes easy things hard and hard things harder - Mason Cooley",
+            "Making miracles is hard work. Most people give up before they happen - Sheryl Crow"
+        ]
 
     def create_rounded_rectangle(self, x1, y1, x2, y2, radius=25, **kwargs):
         points = [x1 + radius, y1, x1 + radius, y1, x2 - radius, y1, x2 - radius, y1, x2, y1,
@@ -226,14 +241,37 @@ class ProgressTracker:
         previous_average = (yesterday_percentage + previous_percentage) / 2
         conn.close()
         return previous_average
+    
 
+    def calculate_weekly_average(self):
+        today = datetime.date.today()
+        last_week = [today - datetime.timedelta(days=i) for i in range(7)]
+        conn = sqlite3.connect("productivity.db")
+        c = conn.cursor()
 
+        total_percentage = 0
+        count = 0
+        for day in last_week:
+            c.execute("SELECT percentage FROM productivity WHERE date = ?", (str(day),))
+            result = c.fetchone()
+            if result:
+                total_percentage += result[0]
+                count += 1
+
+        conn.close()
+        if count > 0:
+            weekly_average = total_percentage / count
+        else:
+            weekly_average = 0.0
+
+        return weekly_average
 
 
     def show_productivity(self):
         today = datetime.date.today()
         yesterday = today - datetime.timedelta(days=1)
         previous_average = self.previous_day_average()
+        weekly_average = self.calculate_weekly_average()
         conn = sqlite3.connect("productivity.db")
         c = conn.cursor()
         c.execute("SELECT percentage FROM productivity WHERE date = ?", (str(today),))
@@ -250,6 +288,14 @@ class ProgressTracker:
             self.additional_progress_label.config(text=f"{yesterday_percentage[0]:.2f}%")
         if previous_average:
             self.daily_progress_var.set(previous_average)
+        if weekly_average:
+            self.weekly_progress_var.set(weekly_average)
+        
+        if previous_average < 60 or weekly_average < 60:
+            self.canvas.itemconfig(self.quote_text, text=random.choice(self.quotes))
+        else:
+            self.canvas.itemconfig(self.quote_text, text="Good job! You are productive")
+
         
 
 
