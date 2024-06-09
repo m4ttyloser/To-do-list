@@ -3,11 +3,12 @@ from tkinter import messagebox, StringVar, Label, Entry, Button, Toplevel
 from ttkbootstrap import ttk, Style
 import pygame
 from PIL import Image, ImageTk, ImageSequence
+from music import MusicPlayer
 
 
 class PomodoroApp:
-    def _init_(self):
-        self.root = tk.Tk()
+    def __init__(self,parent):
+        self.root = Toplevel(parent)
         self.root.geometry("300x200")
         self.root.title("Pomodoro Timer Setup")
         self.style = Style()
@@ -46,6 +47,8 @@ class PomodoroApp:
     def open_timer_window(self):
         if not self.validate_input():
             return
+        
+        self.open_music_player()
 
         self.timer_window = Toplevel(self.root)
         self.timer_window.geometry("500x300")
@@ -140,3 +143,6 @@ class PomodoroApp:
             self.timer_label.config(text="{:02d}:{:02d}".format(minutes, seconds))
             self.cycle_label.config(text="Cycle: {}".format(self.cycles_str.get()))
             self.timer_window.after(1000, self.update_timer)
+
+    def open_music_player(self):
+        MusicPlayer(Toplevel(self.root))

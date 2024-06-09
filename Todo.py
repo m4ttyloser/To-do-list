@@ -5,7 +5,7 @@ import datetime
 import pygame
 import sqlite3
 import random
-from emran import *
+from emran import PomodoroApp
 
 def create_database():
     conn = sqlite3.connect("productivity.db")
@@ -59,11 +59,9 @@ def save_productivity(percentage, score, early_score):
     conn.commit()
     conn.close()
 
-def open_pomodoro_timer():
-    pomodoro_window = Toplevel(root)
-    pomodoro_window.title("Pomodoro timer")
-    pomodoro_window.geometry("500x400")
-    PomodoroTimer(pomodoro_window)
+def open_pomodoro():
+    
+    PomodoroApp(root)
 
 def open_progress_tracker():
     progress_tracker_window = Toplevel(root)
@@ -81,17 +79,10 @@ def add_task():
             update_button_state()
             early_score(1)
             calculate_productivity()
-            current_time = datetime.datetime.now().strftime('%H:%M')
-            if current_time == start_time:
-                play_alarm()
             save_productivity((score / early_scores) * 100 if early_scores > 0 else 0, score, early_scores)
     else:
         messagebox.showwarning("Warning", "Please enter a task.")
 
-def play_alarm():
-    pygame.mixer.init()
-    pygame.mixer.music.load("BLIND.mp3")
-    pygame.mixer.music.play()
 
 def remove_task():
     selected_task_index = listbox.curselection()
@@ -157,27 +148,20 @@ class ProgressTracker:
         self.additional_progress_label.pack(pady=5)
 
         self.daily_label = Label(master, text="Daily", font=("Arial", 10))
-        self.daily_label.place(x=120, y=150)
+        self.daily_label.place(x=185, y=150)
 
         self.daily_progress_var = DoubleVar()
         self.daily_progress_bar = ttk.Progressbar(master, orient="vertical", length=80, mode="determinate", variable=self.daily_progress_var)
-        self.daily_progress_bar.place(x=126, y=170)
+        self.daily_progress_bar.place(x=200, y=170)
 
         
         self.weekly_label = Label(master, text="Weekly", font=("Arial", 10))
-        self.weekly_label.place(x=230, y=150)
+        self.weekly_label.place(x=270, y=150)
 
         self.weekly_progress_var = DoubleVar()
         self.weekly_progress_bar = ttk.Progressbar(master, orient="vertical", length=80, mode="determinate", variable=self.weekly_progress_var)
-        self.weekly_progress_bar.place(x=245, y=170)
+        self.weekly_progress_bar.place(x=290, y=170)
 
-        
-        self.monthly_label = Label(master, text="Monthly", font=("Arial", 10))
-        self.monthly_label.place(x=340, y=150)
-
-        self.monthly_progress_var = DoubleVar()
-        self.monthly_progress_bar = ttk.Progressbar(master, orient="vertical", length=80, mode="determinate", variable=self.monthly_progress_var)
-        self.monthly_progress_bar.place(x=355, y=170)
 
         self.wisdom_label = Label(master, text="Words of wisdom")
         self.wisdom_label.place(x=200, y=270)
@@ -366,7 +350,7 @@ button_mark_as_done.pack(side=RIGHT, pady=10, padx=50)
 
 pomodoro_icon = PhotoImage(file="timer icon.png")
 small_pomodoro_icon = pomodoro_icon.subsample(6, 6)
-Button(root, image=small_pomodoro_icon, bd=0, command=open_pomodoro_timer).place(x=40, y=90)
+Button(root, image=small_pomodoro_icon, bd=0, command=open_pomodoro).place(x=40, y=90)
 
 planner_icon = PhotoImage(file="planner.png")
 small_planner_icon = planner_icon.subsample(6, 6)
