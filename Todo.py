@@ -5,7 +5,7 @@ import datetime
 import pygame
 import sqlite3
 import random
-from emran import *
+from emran import PomodoroApp
 
 def create_database():
     conn = sqlite3.connect("productivity.db")
@@ -59,11 +59,9 @@ def save_productivity(percentage, score, early_score):
     conn.commit()
     conn.close()
 
-def open_pomodoro_timer():
+def open_pomodoro():
     pomodoro_window = Toplevel(root)
-    pomodoro_window.title("Pomodoro timer")
-    pomodoro_window.geometry("500x400")
-    PomodoroTimer(pomodoro_window)
+    PomodoroApp(pomodoro_window)
 
 def open_progress_tracker():
     progress_tracker_window = Toplevel(root)
@@ -366,7 +364,7 @@ button_mark_as_done.pack(side=RIGHT, pady=10, padx=50)
 
 pomodoro_icon = PhotoImage(file="timer icon.png")
 small_pomodoro_icon = pomodoro_icon.subsample(6, 6)
-Button(root, image=small_pomodoro_icon, bd=0, command=open_pomodoro_timer).place(x=40, y=90)
+Button(root, image=small_pomodoro_icon, bd=0, command=open_pomodoro).place(x=40, y=90)
 
 planner_icon = PhotoImage(file="planner.png")
 small_planner_icon = planner_icon.subsample(6, 6)
