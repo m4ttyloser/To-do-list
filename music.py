@@ -1,13 +1,12 @@
 import pygame
 import tkinter as tk
 from tkinter import *
-from tkinter import filedialog
 
 class MusicPlayer:
     def __init__(self, master):
         self.master = master
-        master.title("Music Setting")
-        master.configure(bg="white")
+        master.title("Music Player")
+        master.configure(bg="#1e272e")
 
         self.builtin_songs = [
             "jar of hearts.mp3",
@@ -51,22 +50,35 @@ class MusicPlayer:
             song = self.builtin_songs[index]
             if song not in self.playlist:
                 self.playlist.append(song)
+                self.playlist_box.insert(END, song)
 
     def create_widgets(self):
         # Buttons/Labels
-        self.track_label = Label(self.master, text="No Track Playing",  width=40, bg="black", font=("Arial", 10), fg="white")
-        self.track_label.grid(row=0, column=0, columnspan=3)
+        self.track_label = Label(self.master, text="No Track Playing", width=40, bg="#1e272e", font=("Arial", 10), fg="white")
+        self.track_label.grid(row=0, column=0, columnspan=5, pady=10)
 
-        self.song_menu = Listbox(self.master, selectmode=MULTIPLE, bg="white")
+        self.song_menu = Listbox(self.master, selectmode=MULTIPLE, bg="white", width=40, height=10)
         for song in self.builtin_songs:
             self.song_menu.insert(END, song)
-        self.song_menu.grid(row=1, column=0, columnspan=3, sticky="ew")
+        self.song_menu.grid(row=1, column=0, columnspan=5, sticky="ew", padx=10)
 
-        self.add_button = Button(self.master, text="Add to Playlist", command=self.add_to_playlist, bg="black", fg="white", font=("Arial", 12))
-        self.add_button.grid(row=2, column=2, sticky="ne")
+        self.playlist_label = Label(self.master, text="Playlist", bg="#1e272e", fg="white", font=("Arial", 10))
+        self.playlist_label.grid(row=3, column=0, columnspan=5, pady=(10, 5))
 
-        self.play_button = Button(self.master, text="Play", command=self.play_playlist, bg="black", fg="white", font=("Arial", 12))
-        self.play_button.grid(row=2, column=0)
+        self.playlist_box = Listbox(self.master, bg="white", width=40, height=5)
+        self.playlist_box.grid(row=4, column=0, columnspan=5, sticky="ew", padx=10)
+
+        self.add_button = Button(self.master, text="Add to Playlist", command=self.add_to_playlist, bg="#2ecc71", fg="white", font=("Arial", 12))
+        self.add_button.grid(row=2, column=4, sticky="ne", padx=5, pady=5)
+
+        self.previous_button = Button(self.master, text="Previous", command=self.previous_track, bg="#3498db", fg="white", font=("Arial", 12))
+        self.previous_button.grid(row=2, column=0, padx=5, pady=5)
+
+        self.play_button = Button(self.master, text="Play", command=self.play_playlist, bg="#e74c3c", fg="white", font=("Arial", 12))
+        self.play_button.grid(row=2, column=1, padx=5, pady=5)
+
+        self.next_button = Button(self.master, text="Next", command=self.next_track, bg="#f39c12", fg="white", font=("Arial", 12))
+        self.next_button.grid(row=2, column=2, padx=5, pady=5)
 
         # Disable resizing
         self.master.columnconfigure(0, weight=1)
@@ -81,7 +93,16 @@ class MusicPlayer:
             self.play_song()
         else:
             self.track_label.config(text="Please select songs.")
+    
+    def previous_track(self):
+        if self.current_track > 0:
+            self.current_track -= 1
+            self.play_song()
 
+    def next_track(self):
+        if self.current_track < len(self.playlist) - 1:
+            self.current_track += 1
+            self.play_song()
 
 root = tk.Tk()
 app = MusicPlayer(root)
