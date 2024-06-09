@@ -6,7 +6,7 @@ from PIL import Image, ImageTk, ImageSequence
 
 
 class PomodoroApp:
-    def __init__(self):
+    def _init_(self):
         self.root = tk.Tk()
         self.root.geometry("300x200")
         self.root.title("Pomodoro Timer Setup")
@@ -64,7 +64,8 @@ class PomodoroApp:
         self.cycle_label.place(x=10, y=70, anchor=tk.NW)  
 
         self.start_button = ttk.Button(self.timer_window, text="Start", command=self.start_timer)
-        self.start_button.place(relx=0.5, rely=0.9, anchor=tk.CENTER) 
+        self.start_button.place(relx=0.5, rely=0.9, anchor=tk.CENTER)  
+
         pygame.mixer.init()
         self.alarm_sound = pygame.mixer.Sound("Voicy_Your Phone Ling Ing.wav")
         self.background_sound = pygame.mixer.Sound("Rain-and-birds-sounds.wav")
@@ -139,7 +140,3 @@ class PomodoroApp:
             self.timer_label.config(text="{:02d}:{:02d}".format(minutes, seconds))
             self.cycle_label.config(text="Cycle: {}".format(self.cycles_str.get()))
             self.timer_window.after(1000, self.update_timer)
-
-
-if __name__ == "__main__":
-    PomodoroApp()
