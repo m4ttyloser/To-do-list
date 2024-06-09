@@ -1,12 +1,11 @@
 import tkinter as tk
 from tkinter import messagebox, StringVar, Label, Entry, Button, Toplevel
 from ttkbootstrap import ttk, Style
-import time
 import pygame
 from PIL import Image, ImageTk, ImageSequence
 
 
-class PomdoroApp:
+class PomodoroApp:
     def __init__(self):
         self.root = tk.Tk()
         self.root.geometry("300x200")
@@ -40,6 +39,7 @@ class PomdoroApp:
         self.is_running = False
         self.is_work_time = True
         self.pomodoros_completed = 0
+        self.current_cycle = 0
 
         self.root.mainloop()
 
@@ -57,17 +57,18 @@ class PomdoroApp:
         self.gif_label.place(x=0, y=0, relwidth=1, relheight=1)
         self.animate(0)
 
-        self.timer_label = Label(self.timer_window, text="", font=("TkDefaultFont", 40))
-        self.timer_label.place(relx=0.5, rely=0.1, anchor=tk.CENTER)
+        self.timer_label = Label(self.timer_window, text="Timer", font=("TkDefaultFont", 40))
+        self.timer_label.place(x=10, y=10, anchor=tk.NW)  
+
+        self.cycle_label = Label(self.timer_window, text="Cycle: {}".format(self.cycles_str.get()), font=("Calibri", 12))
+        self.cycle_label.place(x=10, y=70, anchor=tk.NW)  
 
         self.start_button = ttk.Button(self.timer_window, text="Start", command=self.start_timer)
-        self.start_button.place(relx=0.3, rely=0.8, anchor=tk.CENTER)
-
-        self.stop_button = ttk.Button(self.timer_window, text="Stop", command=self.stop_timer, state=tk.DISABLED)
-        self.stop_button.place(relx=0.7, rely=0.8, anchor=tk.CENTER)
-
+        self.start_button.place(relx=0.5, rely=0.9, anchor=tk.CENTER) 
         pygame.mixer.init()
         self.alarm_sound = pygame.mixer.Sound("Voicy_Your Phone Ling Ing.wav")
+        self.background_sound = pygame.mixer.Sound("Rain-and-birds-sounds.wav")
+        self.background_sound.set_volume(0.7)
 
     def animate(self, counter):
         frame = self.frames[counter]
@@ -78,22 +79,21 @@ class PomdoroApp:
         self.timer_window.after(100, self.animate, counter)
 
     def start_timer(self):
-        self.work_time = self.parse_time(self.pomodoro_str.get())
-        self.break_time = self.parse_time(self.break_str.get())
-        self.cycles = int(self.cycles_str.get())
+        if not self.is_running:
+            self.work_time = self.parse_time(self.pomodoro_str.get()) if self.is_work_time else self.work_time
+            self.break_time = self.parse_time(self.break_str.get()) if not self.is_work_time else self.break_time
+            self.cycles = int(self.cycles_str.get())
 
         self.is_running = True
-        self.is_work_time = True
-        self.pomodoros_completed = 0
-
         self.start_button.config(state=tk.DISABLED)
-        self.stop_button.config(state=tk.NORMAL)
         self.update_timer()
 
+        self.background_sound.play(loops=-1)
+
     def stop_timer(self):
-        self.start_button.config(state=tk.NORMAL)
-        self.stop_button.config(state=tk.DISABLED)
         self.is_running = False
+        self.start_button.config(state=tk.NORMAL)
+        self.background_sound.stop()
 
     def validate_input(self):
         try:
@@ -118,19 +118,28 @@ class PomdoroApp:
                 self.work_time -= 1
                 if self.work_time == 0:
                     self.is_work_time = False
-                    self.pomodoros_completed += 1
-                    self.break_time = self.parse_time(self.break_str.get())  
+                    self.break_time = self.parse_time(self.break_str.get())
                     self.alarm_sound.play()
+                    messagebox.showinfo("Break Time", "Take a break!")
             else:
                 self.break_time -= 1
                 if self.break_time == 0:
+                    self.current_cycle += 1
+                    self.cycles_str.set(str(int(self.cycles_str.get()) - 1))
+                    if self.current_cycle >= self.cycles:
+                        self.stop_timer()
+                        messagebox.showinfo("Pomodoro Completed", "Congratulations! You've completed all cycles.")
+                        return
                     self.is_work_time = True
                     self.work_time = self.parse_time(self.pomodoro_str.get())
-                    messagebox.showinfo("Work Time", "Get back to work!")
                     self.alarm_sound.play()
+                    messagebox.showinfo("Work Time", "Get back to work!")
+
             minutes, seconds = divmod(self.work_time if self.is_work_time else self.break_time, 60)
             self.timer_label.config(text="{:02d}:{:02d}".format(minutes, seconds))
+            self.cycle_label.config(text="Cycle: {}".format(self.cycles_str.get()))
             self.timer_window.after(1000, self.update_timer)
 
+
 if __name__ == "__main__":
-    PomdoroApp()
+    PomodoroApp()
