@@ -279,7 +279,7 @@ def load_productivity():
     today = datetime.date.today()
     conn = sqlite3.connect("productivity.db")
     c = conn.cursor()
-    c.execute("SELECT task, score, early_score, percentage FROM productivity WHERE date = ?", (str(today),))
+    c.execute("SELECT task FROM productivity WHERE date = ?", (str(today),))
     rows = c.fetchall()
     conn.close()
 
@@ -287,9 +287,6 @@ def load_productivity():
     global early_scores
 
     if rows:
-        score = rows[0][1]
-        early_scores = rows[0][2]
-        percentage = rows[0][3]
         for row in rows:
             task = row[0]
             listbox.insert(END, task)
