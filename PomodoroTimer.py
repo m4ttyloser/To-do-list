@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import messagebox, StringVar, Label, Entry, Button, Toplevel
-from ttkbootstrap import ttk, Style
 import pygame
 from PIL import Image, ImageTk, ImageSequence
 from music import MusicPlayer
@@ -11,8 +10,7 @@ class PomodoroApp:
         self.root = Toplevel(parent)
         self.root.geometry("300x200")
         self.root.title("Pomodoro Timer Setup")
-        self.style = Style()
-        self.style.theme_use()
+
 
         self.pomodoro_str = StringVar()
         self.break_str = StringVar()
@@ -60,16 +58,16 @@ class PomodoroApp:
         self.gif_label.place(x=0, y=0, relwidth=1, relheight=1)
         self.animate(0)
 
-        self.timer_label = Label(self.timer_window, text="Timer", font=("TkDefaultFont", 40))
+        self.timer_label = Label(self.timer_window, text="Timer", font=("Calibri", 40))
         self.timer_label.place(x=10, y=10, anchor=tk.NW)  
 
         self.cycle_label = Label(self.timer_window, text="Cycle: {}".format(self.cycles_str.get()), font=("Calibri", 12))
         self.cycle_label.place(x=10, y=70, anchor=tk.NW)  
 
-        self.start_button = ttk.Button(self.timer_window, text="Start", command=self.start_timer)
+        self.start_button = tk.Button(self.timer_window, text="Start", command=self.start_timer)
         self.start_button.place(relx=0.3, rely=0.9, anchor=tk.CENTER)  
 
-        self.stop_button = ttk.Button(self.timer_window, text="Stop Sound", command=self.stop_background_sound)
+        self.stop_button = tk.Button(self.timer_window, text="Stop Sound", command=self.stop_background_sound)
         self.stop_button.place(relx=0.7, rely=0.9, anchor=tk.CENTER) 
 
         pygame.mixer.init()
@@ -153,9 +151,3 @@ class PomodoroApp:
     def open_music_player(self):
         MusicPlayer(Toplevel(self.root))
 
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    root.withdraw()
-    app = PomodoroApp(root)
-    root.mainloop()
