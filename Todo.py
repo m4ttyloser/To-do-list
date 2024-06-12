@@ -134,7 +134,7 @@ class ProgressTracker:
         self.today_label.place(x=50, y=9)
 
         self.progress_label = Label(master, text="0%", bg="lightblue")
-        self.progress_label.pack(pady=5)
+        self.progress_label.pack(pady=3)
 
         self.additional_progress_var = DoubleVar()
         self.additional_progress_bar = ttk.Progressbar(master, orient="horizontal", length=300, mode="determinate", variable=self.additional_progress_var)
@@ -144,23 +144,29 @@ class ProgressTracker:
         self.yesterday_label = Label(master, text="Yesterday", font=("Arial", 10))
         self.yesterday_label.place(x=30, y=81)
 
-        self.additional_progress_label = Label(master, text="0%")
-        self.additional_progress_label.pack(pady=5)
+        self.additional_progress_label = Label(master, text="0%", bg = "lightblue")
+        self.additional_progress_label.pack(pady=3)
 
-        self.daily_label = Label(master, text="Daily", font=("Arial", 10))
-        self.daily_label.place(x=185, y=150)
+        self.daily_label = Label(master, text="2 Days AVG", font=("Arial", 10))
+        self.daily_label.place(x=20, y=150)
 
         self.daily_progress_var = DoubleVar()
-        self.daily_progress_bar = ttk.Progressbar(master, orient="vertical", length=80, mode="determinate", variable=self.daily_progress_var)
-        self.daily_progress_bar.place(x=200, y=170)
+        self.daily_progress_bar = ttk.Progressbar(master, orient="horizontal", length=300, mode="determinate", variable=self.daily_progress_var)
+        self.daily_progress_bar.pack(pady=10)
+
+        self.daily_label = Label(master, text="0%", bg="lightblue")
+        self.daily_label.pack(pady=3)
 
         
-        self.weekly_label = Label(master, text="Weekly", font=("Arial", 10))
-        self.weekly_label.place(x=270, y=150)
+        self.weekly_label = Label(master, text="Weekly AVG", font=("Arial", 10))
+        self.weekly_label.place(x=15, y=220)
 
         self.weekly_progress_var = DoubleVar()
-        self.weekly_progress_bar = ttk.Progressbar(master, orient="vertical", length=80, mode="determinate", variable=self.weekly_progress_var)
-        self.weekly_progress_bar.place(x=290, y=170)
+        self.weekly_progress_bar = ttk.Progressbar(master, orient="horizontal", length=300, mode="determinate", variable=self.weekly_progress_var)
+        self.weekly_progress_bar.pack(pady=10)
+
+        self.weekly_label = Label(master, text="0%", bg="lightblue")
+        self.weekly_label.pack(pady=3)
 
 
         self.wisdom_label = Label(master, text="Words of wisdom")
@@ -264,8 +270,10 @@ class ProgressTracker:
             self.additional_progress_label.config(text=f"{yesterday_percentage[0]:.2f}%")
         if previous_average:
             self.daily_progress_var.set(previous_average)
+            self.daily_label.config(text=f"{previous_average:.2f}%")
         if weekly_average:
             self.weekly_progress_var.set(weekly_average)
+            self.weekly_label.config(text=f"{weekly_average:.2f}%")
         
         if previous_average < 60 or weekly_average < 60:
             self.canvas.itemconfig(self.quote_text, text=random.choice(self.quotes))
@@ -282,9 +290,6 @@ def load_productivity():
     c.execute("SELECT task FROM productivity WHERE date = ?", (str(today),))
     rows = c.fetchall()
     conn.close()
-
-    global score
-    global early_scores
 
     if rows:
         for row in rows:
