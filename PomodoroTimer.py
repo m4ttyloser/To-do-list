@@ -11,7 +11,6 @@ class PomodoroApp:
         self.root.geometry("300x200")
         self.root.title("Pomodoro Timer Setup")
 
-
         self.pomodoro_str = StringVar()
         self.break_str = StringVar()
         self.cycles_str = StringVar()
@@ -35,6 +34,9 @@ class PomodoroApp:
         self.set_time_button = Button(self.root, text='Start Pomodoro', bd='2', font=("Calibri", 12), command=self.open_timer_window)
         self.set_time_button.place(relx=0.5, rely=0.7, anchor=tk.CENTER)
 
+        self.music_playlist_button = Button(self.root, text='Music Setup', bd='2', font=("Calibri", 12), command=self.open_playlist_window)
+        self.music_playlist_button.place(relx=0.8, rely=0.1, anchor=tk.CENTER)
+
         self.is_running = False
         self.is_work_time = True
         self.pomodoros_completed = 0
@@ -45,9 +47,6 @@ class PomodoroApp:
     def open_timer_window(self):
         if not self.validate_input():
             return
-        
-        self.open_music_player()
-
         self.timer_window = Toplevel(self.root)
         self.timer_window.geometry("500x300")
         self.timer_window.title("Pomodoro Timer")
@@ -65,15 +64,14 @@ class PomodoroApp:
         self.cycle_label.place(x=10, y=70, anchor=tk.NW)  
 
         self.start_button = tk.Button(self.timer_window, text="Start", command=self.start_timer)
-        self.start_button.place(relx=0.3, rely=0.9, anchor=tk.CENTER)  
-
-        self.stop_button = tk.Button(self.timer_window, text="Stop Sound", command=self.stop_background_sound)
-        self.stop_button.place(relx=0.7, rely=0.9, anchor=tk.CENTER) 
+        self.start_button.place(relx=0.5, rely=0.9, anchor=tk.CENTER)
 
         pygame.mixer.init()
-        self.alarm_sound = pygame.mixer.Sound("Voicy_Your Phone Ling Ing.wav")
-        self.background_sound = pygame.mixer.Sound("Rain-and-birds-sounds.wav")
-        self.background_sound.set_volume(0.7)
+        self.alarm_sound = pygame.mixer.Sound("Alarm-clock-bell-ringing-sound-effect.wav")
+
+    def open_playlist_window(self):
+        self.player_window = Toplevel(self.root)
+        self.music_player = MusicPlayer(self.player_window)
 
     def animate(self, counter):
         frame = self.frames[counter]
@@ -92,16 +90,15 @@ class PomodoroApp:
         self.is_running = True
         self.start_button.config(state=tk.DISABLED)
         self.update_timer()
+        self.play_music_from_playlist()
 
-        self.background_sound.play(loops=-1)
+    def play_music_from_playlist(self):
+        self.music_player.play_playlist()
+
 
     def stop_timer(self):
         self.is_running = False
         self.start_button.config(state=tk.NORMAL)
-        self.background_sound.stop()
-
-    def stop_background_sound(self):
-        self.background_sound.stop()
 
     def validate_input(self):
         try:
@@ -128,6 +125,7 @@ class PomodoroApp:
                     self.is_work_time = False
                     self.break_time = self.parse_time(self.break_str.get())
                     self.alarm_sound.play()
+                    self.music_player.stop_song()
                     messagebox.showinfo("Break Time", "Take a break!")
             else:
                 self.break_time -= 1
@@ -140,14 +138,10 @@ class PomodoroApp:
                         return
                     self.is_work_time = True
                     self.work_time = self.parse_time(self.pomodoro_str.get())
-                    self.alarm_sound.play()
+                    self.music_player.play_playlist()
                     messagebox.showinfo("Work Time", "Get back to work!")
 
             minutes, seconds = divmod(self.work_time if self.is_work_time else self.break_time, 60)
             self.timer_label.config(text="{:02d}:{:02d}".format(minutes, seconds))
             self.cycle_label.config(text="Cycle: {}".format(self.cycles_str.get()))
             self.timer_window.after(1000, self.update_timer)
-
-    def open_music_player(self):
-        MusicPlayer(Toplevel(self.root))
-
