@@ -29,14 +29,17 @@ create_database()
 score = 0
 early_scores = 0
 
+#continously update button state after changes
 def update_button_state():
     has_undone_tasks = any(not task.endswith("\u2713") for task in listbox.get(0, END))
     button_mark_as_done.config(state=NORMAL if has_undone_tasks else DISABLED)
 
+#Scores before tasks completion
 def early_score(early_points):
     global early_scores
     early_scores += early_points
 
+#percentage calculation
 def calculate_productivity():
     global early_scores
     global score
@@ -45,6 +48,7 @@ def calculate_productivity():
     else:
         percentage = 0
     save_productivity(percentage, score, early_scores)
+
 
 def save_productivity(percentage, score, early_score):
     today = datetime.date.today()
@@ -59,14 +63,17 @@ def save_productivity(percentage, score, early_score):
     conn.commit()
     conn.close()
 
+#open pomodoro window
 def open_pomodoro():
     
     PomodoroApp(root)
+
 
 def open_progress_tracker():
     progress_tracker_window = Toplevel(root)
     progress_tracker = ProgressTracker(progress_tracker_window)
     progress_tracker.show_productivity()
+
 
 def add_task():
     task_text = task_entry.get()
@@ -95,10 +102,11 @@ def remove_task():
     else:
         messagebox.showwarning("Warning", "Please select a task to remove.")
 
+
 def mark_as_done():
-    selected_task_indices = listbox.curselection()
-    if selected_task_indices:
-        for index in selected_task_indices:
+    select_index = listbox.curselection()
+    if select_index:
+        for index in select_index:
             selected_task = listbox.get(index)
             if isinstance(selected_task, str):
                 if not selected_task.endswith("\u2713"):
@@ -190,7 +198,8 @@ class ProgressTracker:
             "Procrastination makes easy things hard and hard things harder - Mason Cooley",
             "Making miracles is hard work. Most people give up before they happen - Sheryl Crow"
         ]
-
+    
+    # Rounded rectangle for qoutes, got it from stack overflow
     def create_rounded_rectangle(self, x1, y1, x2, y2, radius=25, **kwargs):
         points = [x1 + radius, y1, x1 + radius, y1, x2 - radius, y1, x2 - radius, y1, x2, y1,
                   x2, y1 + radius, x2, y1 + radius, x2, y2 - radius, x2, y2 - radius, x2, y2,
@@ -225,6 +234,7 @@ class ProgressTracker:
         return previous_average
     
 
+    #Calculate weekly average
     def calculate_weekly_average(self):
         today = datetime.date.today()
         last_week = [today - datetime.timedelta(days=i) for i in range(7)]
@@ -249,6 +259,7 @@ class ProgressTracker:
         return weekly_average
 
 
+    #Fetch productivity from database and calculations
     def show_productivity(self):
         today = datetime.date.today()
         yesterday = today - datetime.timedelta(days=1)
@@ -281,8 +292,7 @@ class ProgressTracker:
             self.canvas.itemconfig(self.quote_text, text="Good job! You are productive")
 
         
-
-
+#Load productivity into listbos
 def load_productivity():
     today = datetime.date.today()
     conn = sqlite3.connect("productivity.db")
@@ -352,16 +362,12 @@ button_mark_as_done.pack(side=RIGHT, pady=10, padx=50)
 
 pomodoro_icon = PhotoImage(file="timer icon.png")
 small_pomodoro_icon = pomodoro_icon.subsample(6, 6)
-Button(root, image=small_pomodoro_icon, bd=0, command=open_pomodoro).place(x=40, y=90)
-
-planner_icon = PhotoImage(file="planner.png")
-small_planner_icon = planner_icon.subsample(6, 6)
-Label(root, image=small_planner_icon, bd=0).place(x=150, y=90)
+Button(root, image=small_pomodoro_icon, bd=0, command=open_pomodoro).place(x=80, y=90)
 
 early_scores = 0
 progress_icon = PhotoImage(file="progress.png")
 small_progress_icon = progress_icon.subsample(6, 6)
-Button(root, image=small_progress_icon, bd=0, command=open_progress_tracker).place(x=280, y=90)
+Button(root, image=small_progress_icon, bd=0, command=open_progress_tracker).place(x=240, y=90)
 
 load_productivity()
 root.mainloop()
