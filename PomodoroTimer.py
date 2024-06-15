@@ -58,10 +58,10 @@ class PomodoroApp:
         self.animate(0)
 
         self.timer_label = Label(self.timer_window, text="Timer", font=("Calibri", 40))
-        self.timer_label.place(x=10, y=10, anchor=tk.NW)  
+        self.timer_label.place(x=10, y=10, anchor=tk.NW)
 
         self.cycle_label = Label(self.timer_window, text="Cycle: {}".format(self.cycles_str.get()), font=("Calibri", 12))
-        self.cycle_label.place(x=10, y=70, anchor=tk.NW)  
+        self.cycle_label.place(x=10, y=70, anchor=tk.NW)
 
         self.start_button = tk.Button(self.timer_window, text="Start", command=self.start_timer)
         self.start_button.place(relx=0.5, rely=0.9, anchor=tk.CENTER)
@@ -94,7 +94,6 @@ class PomodoroApp:
 
     def play_music_from_playlist(self):
         self.music_player.play_playlist()
-
 
     def stop_timer(self):
         self.is_running = False
@@ -134,11 +133,13 @@ class PomodoroApp:
                     self.cycles_str.set(str(int(self.cycles_str.get()) - 1))
                     if self.current_cycle >= self.cycles:
                         self.stop_timer()
+                        self.alarm_sound.play()
                         messagebox.showinfo("Pomodoro Completed", "Congratulations! You've completed all cycles.")
                         return
                     self.is_work_time = True
                     self.work_time = self.parse_time(self.pomodoro_str.get())
                     self.music_player.play_playlist()
+                    self.alarm_sound.play()  # Added alarm sound for break end
                     messagebox.showinfo("Work Time", "Get back to work!")
 
             minutes, seconds = divmod(self.work_time if self.is_work_time else self.break_time, 60)
