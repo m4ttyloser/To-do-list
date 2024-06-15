@@ -110,7 +110,3 @@ class MusicPlayer:
         if self.current_track < len(self.playlist) - 1:
             self.current_track += 1
             self.play_song()
-
-root = Tk()
-music_player = MusicPlayer(root)
-root.mainloop()
