@@ -5,7 +5,7 @@ import datetime
 import pygame
 import sqlite3
 import random
-from emran import *
+from PomodoroTimer import PomodoroApp
 
 def create_database():
     conn = sqlite3.connect("productivity.db")
@@ -59,11 +59,9 @@ def save_productivity(percentage, score, early_score):
     conn.commit()
     conn.close()
 
-def open_pomodoro_timer():
-    pomodoro_window = Toplevel(root)
-    pomodoro_window.title("Pomodoro timer")
-    pomodoro_window.geometry("500x400")
-    PomodoroTimer(pomodoro_window)
+def open_pomodoro():
+    
+    PomodoroApp(root)
 
 def open_progress_tracker():
     progress_tracker_window = Toplevel(root)
@@ -81,17 +79,10 @@ def add_task():
             update_button_state()
             early_score(1)
             calculate_productivity()
-            current_time = datetime.datetime.now().strftime('%H:%M')
-            if current_time == start_time:
-                play_alarm()
             save_productivity((score / early_scores) * 100 if early_scores > 0 else 0, score, early_scores)
     else:
         messagebox.showwarning("Warning", "Please enter a task.")
 
-def play_alarm():
-    pygame.mixer.init()
-    pygame.mixer.music.load("BLIND.mp3")
-    pygame.mixer.music.play()
 
 def remove_task():
     selected_task_index = listbox.curselection()
@@ -143,7 +134,7 @@ class ProgressTracker:
         self.today_label.place(x=50, y=9)
 
         self.progress_label = Label(master, text="0%", bg="lightblue")
-        self.progress_label.pack(pady=5)
+        self.progress_label.pack(pady=3)
 
         self.additional_progress_var = DoubleVar()
         self.additional_progress_bar = ttk.Progressbar(master, orient="horizontal", length=300, mode="determinate", variable=self.additional_progress_var)
@@ -153,31 +144,30 @@ class ProgressTracker:
         self.yesterday_label = Label(master, text="Yesterday", font=("Arial", 10))
         self.yesterday_label.place(x=30, y=81)
 
-        self.additional_progress_label = Label(master, text="0%")
-        self.additional_progress_label.pack(pady=5)
+        self.additional_progress_label = Label(master, text="0%", bg = "lightblue")
+        self.additional_progress_label.pack(pady=3)
 
-        self.daily_label = Label(master, text="Daily", font=("Arial", 10))
-        self.daily_label.place(x=120, y=150)
+        self.daily_label = Label(master, text="2 Days AVG", font=("Arial", 10))
+        self.daily_label.place(x=20, y=150)
 
         self.daily_progress_var = DoubleVar()
-        self.daily_progress_bar = ttk.Progressbar(master, orient="vertical", length=80, mode="determinate", variable=self.daily_progress_var)
-        self.daily_progress_bar.place(x=126, y=170)
+        self.daily_progress_bar = ttk.Progressbar(master, orient="horizontal", length=300, mode="determinate", variable=self.daily_progress_var)
+        self.daily_progress_bar.pack(pady=10)
+
+        self.daily_label = Label(master, text="0%", bg="lightblue")
+        self.daily_label.pack(pady=3)
 
         
-        self.weekly_label = Label(master, text="Weekly", font=("Arial", 10))
-        self.weekly_label.place(x=230, y=150)
+        self.weekly_label = Label(master, text="Weekly AVG", font=("Arial", 10))
+        self.weekly_label.place(x=15, y=220)
 
         self.weekly_progress_var = DoubleVar()
-        self.weekly_progress_bar = ttk.Progressbar(master, orient="vertical", length=80, mode="determinate", variable=self.weekly_progress_var)
-        self.weekly_progress_bar.place(x=245, y=170)
+        self.weekly_progress_bar = ttk.Progressbar(master, orient="horizontal", length=300, mode="determinate", variable=self.weekly_progress_var)
+        self.weekly_progress_bar.pack(pady=10)
 
-        
-        self.monthly_label = Label(master, text="Monthly", font=("Arial", 10))
-        self.monthly_label.place(x=340, y=150)
+        self.weekly_label = Label(master, text="0%", bg="lightblue")
+        self.weekly_label.pack(pady=3)
 
-        self.monthly_progress_var = DoubleVar()
-        self.monthly_progress_bar = ttk.Progressbar(master, orient="vertical", length=80, mode="determinate", variable=self.monthly_progress_var)
-        self.monthly_progress_bar.place(x=355, y=170)
 
         self.wisdom_label = Label(master, text="Words of wisdom")
         self.wisdom_label.place(x=200, y=270)
@@ -280,8 +270,10 @@ class ProgressTracker:
             self.additional_progress_label.config(text=f"{yesterday_percentage[0]:.2f}%")
         if previous_average:
             self.daily_progress_var.set(previous_average)
+            self.daily_label.config(text=f"{previous_average:.2f}%")
         if weekly_average:
             self.weekly_progress_var.set(weekly_average)
+            self.weekly_label.config(text=f"{weekly_average:.2f}%")
         
         if previous_average < 60 or weekly_average < 60:
             self.canvas.itemconfig(self.quote_text, text=random.choice(self.quotes))
@@ -295,17 +287,11 @@ def load_productivity():
     today = datetime.date.today()
     conn = sqlite3.connect("productivity.db")
     c = conn.cursor()
-    c.execute("SELECT task, score, early_score, percentage FROM productivity WHERE date = ?", (str(today),))
+    c.execute("SELECT task FROM productivity WHERE date = ?", (str(today),))
     rows = c.fetchall()
     conn.close()
 
-    global score
-    global early_scores
-
     if rows:
-        score = rows[0][1]
-        early_scores = rows[0][2]
-        percentage = rows[0][3]
         for row in rows:
             task = row[0]
             listbox.insert(END, task)
@@ -366,7 +352,7 @@ button_mark_as_done.pack(side=RIGHT, pady=10, padx=50)
 
 pomodoro_icon = PhotoImage(file="timer icon.png")
 small_pomodoro_icon = pomodoro_icon.subsample(6, 6)
-Button(root, image=small_pomodoro_icon, bd=0, command=open_pomodoro_timer).place(x=40, y=90)
+Button(root, image=small_pomodoro_icon, bd=0, command=open_pomodoro).place(x=40, y=90)
 
 planner_icon = PhotoImage(file="planner.png")
 small_planner_icon = planner_icon.subsample(6, 6)
