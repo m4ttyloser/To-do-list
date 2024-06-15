@@ -38,6 +38,10 @@ class MusicPlayer:
         pygame.mixer.music.play()
         self.update_track_label()
 
+    def stop_song(self):
+        pygame.mixer.music.stop()
+        self.track_label.config(text="No Track Playing")
+
     def update_track_label(self):
         if self.playlist:
             self.track_label.config(text="Now Playing: " + self.playlist[self.current_track])
@@ -79,6 +83,9 @@ class MusicPlayer:
 
         self.next_button = Button(self.master, text="Next", command=self.next_track, bg="#f39c12", fg="white", font=("Arial", 12))
         self.next_button.grid(row=2, column=2, padx=5, pady=5)
+
+        self.stop_button = Button(self.master, text="Stop", command=self.stop_song, bg="#9b59b6", fg="white", font=("Arial", 12))
+        self.stop_button.grid(row=2, column=3, padx=5, pady=5)
 
         # Disable resizing
         self.master.columnconfigure(0, weight=1)
